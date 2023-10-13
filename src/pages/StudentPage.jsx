@@ -22,13 +22,14 @@ const StudentsPage = () => {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [teacherId, setTeacherId] = useState();
 
   const [id, setId] = useState(null);
   const [form] = Form.useForm();
 
   const handleChange = (value) => {
     setSelected(value);
-    setId(value);
+    setTeacherId(value);
   };
 
   const showModal = () => {
@@ -37,19 +38,17 @@ const StudentsPage = () => {
     setIsModalOpen(true);
   };
 
-  const getFinalData = useCallback(async () => {
+  const getStudents = useCallback(async () => {
     try {
       setLoading(true);
-      let { data } = await request.get(
-        `teacher/${id}/student?firstName=${search}`
-      );
+      let { data } = await request.get(`teacher/${teacherId}/student`);
       setStudentData(data);
     } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
     }
-  }, [id, search]);
+  }, [teacherId, search]);
 
   const handleOk = async () => {
     try {
@@ -60,7 +59,7 @@ const StudentsPage = () => {
       } else {
         await request.put(`teacher/${id}/student/${selected}`, values);
       }
-      getFinalData();
+      getStudents();
       setIsModalOpen(false);
     } catch (err) {
       console.log(err);
@@ -83,10 +82,10 @@ const StudentsPage = () => {
       }
     };
 
-    getFinalData();
+    getStudents();
 
     getTeachers();
-  }, [selected, id, getFinalData]);
+  }, [selected, id, getStudents]);
 
   const editStudent = async (id) => {
     try {
@@ -105,7 +104,7 @@ const StudentsPage = () => {
       title: "Do you want to delete this student ?",
       onOk: async () => {
         await request.delete(`teacher/${id}/student/${data}`);
-        getFinalData();
+        getStudents();
       },
     });
   };
@@ -119,13 +118,15 @@ const StudentsPage = () => {
   let options = names.map((name) => {
     return {
       label: name,
+      value: id
     };
   });
-  options = ids.map((id) => {
-    return {
-      value: id,
-    };
-  });
+  // options = ids.map((id) => {
+  //   return {
+
+  //     value: (id ? id : '9'),
+  //   };
+  // });
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -142,18 +143,7 @@ const StudentsPage = () => {
       dataIndex: "lastName",
       key: "lastName",
     },
-    {
-      title: "Mark",
-      dataIndex: "mark",
-      key: "mark",
-      render: (data) => <p className="salary-info">{data}/100</p>,
-    },
-    {
-      title: "Attendance",
-      dataIndex: "attendance",
-      key: "attendance",
-      render: (data) => <p className="student-attendance">{data}%</p>,
-    },
+
     {
       title: "Works ?",
       dataIndex: "isWork",
