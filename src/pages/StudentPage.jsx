@@ -3,6 +3,7 @@ import {
   Checkbox,
   Flex,
   Form,
+  Image,
   Input,
   Modal,
   Select,
@@ -48,16 +49,16 @@ const StudentsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [teacherId, search]);
+  }, [teacherId]);
 
   const handleOk = async () => {
     try {
       setModalLoading(true);
       let values = await form.validateFields();
       if (selected === null) {
-        await request.post(`teacher/${id}/student`, values);
+        await request.post(`teacher/${teacherId}/student`, values);
       } else {
-        await request.put(`teacher/${id}/student/${selected}`, values);
+        await request.put(`teacher/${teacherId}/student/${selected}`, values);
       }
       getStudents();
       setIsModalOpen(false);
@@ -92,7 +93,7 @@ const StudentsPage = () => {
       form.resetFields();
       setIsModalOpen(true);
       setSelected(id);
-      let { data } = await request.get(`teacher/${id}/student/${id}`);
+      let { data } = await request.get(`teacher/${teacherId}/student/${id}`);
       form.setFieldsValue(data);
     } catch (err) {
       console.log(err);
@@ -103,7 +104,7 @@ const StudentsPage = () => {
     Modal.confirm({
       title: "Do you want to delete this student ?",
       onOk: async () => {
-        await request.delete(`teacher/${id}/student/${data}`);
+        await request.delete(`teacher/${teacherId}/student/${data}`);
         getStudents();
       },
     });
@@ -115,16 +116,16 @@ const StudentsPage = () => {
     names.push(teachers[i].firstName);
     ids.push(teachers[i].id);
   }
+  console.log(ids);
   let options = names.map((name) => {
     return {
       label: name,
-      value: id
     };
   });
-  // options = ids.map((id) => {
+  // options = ids.map((name) => {
   //   return {
 
-  //     value: (id ? id : '9'),
+  //     value: name,
   //   };
   // });
 
@@ -133,6 +134,14 @@ const StudentsPage = () => {
   };
 
   const columns = [
+    {
+      title: "Image",
+      dataIndex: "image",
+      key: "image",
+      render: (data) => {
+        return <Image height={50} src={data} />;
+      },
+    },
     {
       title: "FirstName",
       dataIndex: "firstName",
@@ -143,9 +152,18 @@ const StudentsPage = () => {
       dataIndex: "lastName",
       key: "lastName",
     },
-
+ {
+      title: "Phone Number",
+      dataIndex: "phoneNumber",
+      key: "phoneNumber",
+    },
     {
-      title: "Works ?",
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "isWork",
       dataIndex: "isWork",
       key: "isWork",
       render: (data) => (data ? "Yes" : "No"),
@@ -172,13 +190,16 @@ const StudentsPage = () => {
       <Flex align="center" justify="space-between" gap={30}>
         <h1>Students</h1>
         <Search
-          placeholder="Searching .."
+          placeholder="Searching students .."
           onChange={(e) => setSearch(e.target.value)}
           size="large"
         />
-      </Flex>
-
       <Flex className="filter-box" align="center" justify="right" gap={20}>
+        <Select
+          defaultValue="Teachers ID"
+          onChange={handleChange}
+          options={options}
+        />
         <Button
           onClick={showModal}
           className="modal-btn"
@@ -187,12 +208,9 @@ const StudentsPage = () => {
         >
           Add student
         </Button>
-        <Select
-          defaultValue="Teachers ID"
-          onChange={handleChange}
-          options={options}
-        />
       </Flex>
+      </Flex>
+
       <Table
         scroll={{
           x: 1000,
@@ -233,7 +251,7 @@ const StudentsPage = () => {
             rules={[
               {
                 required: true,
-                message: "Please input your firstname!",
+                message: "Please fill!",
               },
             ]}
           >
@@ -247,31 +265,15 @@ const StudentsPage = () => {
             rules={[
               {
                 required: true,
-                message: "Please input your lastname!",
+                message: "Please fill!",
               },
             ]}
           >
             <Input />
           </Form.Item>
-
           <Form.Item
-            className="form-item"
-            label="Mark"
-            name="mark"
-            rules={[
-              {
-                required: true,
-                message: "Please input your mark!",
-              },
-            ]}
-          >
-            <Input type="number" />
-          </Form.Item>
-
-          <Form.Item
-            className="form-item"
-            label="Attendance"
-            name="attendance"
+            label="Phone Number"
+            name="phoneNumber"
             rules={[
               {
                 required: true,
@@ -279,7 +281,31 @@ const StudentsPage = () => {
               },
             ]}
           >
-            <Input type="number" />
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please fill!",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="Image URL"
+            name="image"
+            rules={[
+              {
+                required: true,
+                message: "Please fill!",
+              },
+            ]}
+          >
+            <Input />
           </Form.Item>
 
           <Form.Item
@@ -291,7 +317,7 @@ const StudentsPage = () => {
               span: 16,
             }}
           >
-            <Checkbox>Works ?</Checkbox>
+            <Checkbox>isWork</Checkbox>
           </Form.Item>
         </Form>
       </Modal>
