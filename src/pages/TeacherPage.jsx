@@ -10,6 +10,7 @@ import {
   Space,
   Table,
 } from "antd";
+import Search from "antd/es/input/Search";
 import { useEffect, useState } from "react";
 import { useCallback } from "react";
 import { Fragment } from "react";
@@ -26,8 +27,9 @@ const TeacherPage = () => {
   const [modalLoading, setModalLoading] = useState(false);
   const [activePage, setActivePage] = useState(1)
   const [total, setTotal] = useState(1)
+  const [search, setSearch] = useState("");
 
-
+console.log(search);
 
   const getData = useCallback(async () => {
     try {
@@ -165,6 +167,9 @@ const TeacherPage = () => {
       ),
     },
   ];
+  const onSearch = (value) => {
+    setSearch(value);
+  };
   return (
     <Fragment>
       <Table
@@ -174,9 +179,19 @@ const TeacherPage = () => {
         title={() => (
           <Flex justify="space-between" align="center">
             <h1>Teachers ({total})</h1>
+            <Flex align="center">
+            <Search
+              placeholder="Searching .."
+              // enterButton="Search"
+              onSearch={onSearch}
+              onChange={(e) => setSearch(e.target.value)}
+              size="large"
+              // style={{padding: "0px 250px"}}
+            />
             <Button onClick={showModal} type="dashed">
               Add teacher
             </Button>
+            </Flex>
           </Flex>
         )}
         loading={loading}

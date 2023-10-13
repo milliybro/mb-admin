@@ -116,18 +116,18 @@ const StudentsPage = () => {
     names.push(teachers[i].firstName);
     ids.push(teachers[i].id);
   }
-  console.log(ids);
+  console.log(teachers);
   let options = names.map((name) => {
     return {
       label: name,
     };
   });
-  // options = ids.map((name) => {
-  //   return {
+  options = ids.map((name) => {
+    return {
 
-  //     value: name,
-  //   };
-  // });
+      value: name,
+    };
+  });
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -196,14 +196,14 @@ const StudentsPage = () => {
         />
       <Flex className="filter-box" align="center" justify="right" gap={20}>
         <Select
-          defaultValue="Teachers ID"
+          defaultValue="Teachers"
           onChange={handleChange}
           options={options}
         />
         <Button
           onClick={showModal}
           className="modal-btn"
-          type="primary"
+          type="dashed"
           size="large"
         >
           Add student
@@ -235,7 +235,7 @@ const StudentsPage = () => {
         <Form
           form={form}
           className="modal-form"
-          name="login"
+          name="form"
           labelCol={{
             span: 24,
           }}
